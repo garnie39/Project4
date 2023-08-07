@@ -1,5 +1,6 @@
-const { MongoClient, MongoClient } = require("mongodb");
-const MongoClient = new MongoClient(process.env.MONGO_DB_CONNECTION_STRING);
+require("dotenv").config();
+const { MongoClient } = require("mongodb");
+const mongoClient = new MongoClient(process.env.MONGO_DB_CONNECTION_STRING);
 
 let userCollection;
 let programCollection;
@@ -8,9 +9,10 @@ let activityCollection;
 
 const connectToMongoDb = () => {
   try {
-    MongoClient.connect()
+    mongoClient
+      .connect()
       .then((_) => {
-        const db = MongoClient.db("socialDiet");
+        const db = mongoClient.db("socialDiet");
         userCollection = db.collection("user");
         programCollection = db.collection("program");
         dailyCollection = db.collection("dailyRecord");

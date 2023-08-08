@@ -1,37 +1,35 @@
-const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 3000;
-const { connectToMongoDb } = require("./src/db/database");
+import express from 'express';
+import mongoose from "mongoose";
+import  connectToMongoDb  from "./db/database.js";
+import registerRoute from "./routes/register.js"
+import apiUsersRoute from "./routes/api/users.js"
+
+// import { enableSession } from "./middleware/session.js";
+
+const app = express()
+const PORT = process.env.PORT || 3000
+
 app.use(express.static("public"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(enableSession);
+// app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true}));
 
 connectToMongoDb();
 
-require("dotenv").config();
-const expressSession = require("express-session");
-const MongoStore = require("connect-mongo");
 
-app.use(
-  expressSession({
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGO_DB_CONNECTION_STRING,
-      dbName: "socialDiet",
-    }),
-    secret: process.env.EXPRESS_SESSION_SECRET_KEY,
-  })
-);
 
-const loginApi = require("./src/controllers/session");
-const signupApi = require("./src/controllers/users");
+app.use("/api/user", apiUsersRoute);
+app.use("/register", registerRoute);
 
-app.use("/api", loginApi);
-app.use("/api", signupApi);
 
 app.get("/", (req, res) => {
-  res.json({ message: "hello" });
-});
+    res.json({ message: "hello why?" });
+  });
 
-app.listen(PORT, () => {
-  console.log("app is running");
-});
+//After mongoose client opens a successfull connection to the database, check if it returns "open", and if so, run the callback below which turns on the server.
+mongoose.connection.once("open", () => {
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => console.log(`server running on port%%%%% ${PORT}`));
+  });
+
